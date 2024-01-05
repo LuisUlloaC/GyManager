@@ -1,0 +1,21 @@
+asgiref==3.7.2
+cffi==1.16.0
+cryptography==41.0.5
+Django==4.2.7
+djangorestframework==3.14.0
+djangorestframework-simplejwt==5.3.0
+llvmlite==0.40.1
+netifaces @ file:///C:/Users/Home/Downloads/Wheels%281%29/netifaces-0.11.0-cp311-cp311-win_amd64.whl#sha256=b0a32f1ff4fdaaf40541278d5c8e9dedc0911ae0e4d1f71dca21a9ba3acc107f
+numba==0.57.1
+numpy==1.24.4
+Pillow==10.1.0
+pycparser==2.21
+pygame==2.5.1
+pygraphviz @ file:///C:/Users/Home/Downloads/Wheels%282%29/pygraphviz-1.11-cp311-cp311-win_amd64.whl#sha256=18f2ed58fdbebedc28c82113b502a93f3b8a578b15b858c77b5a519cb6337d6f
+PyJWT==2.8.0
+PyQt5==5.15.9
+PyQt5-Qt5==5.15.2
+PyQt5-sip==12.12.2
+pytz==2023.3.post1
+sqlparse==0.4.4
+tzdata==2023.3
