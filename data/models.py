@@ -6,6 +6,8 @@ class Cliente(models.Model):
     primer_apellido = models.CharField(max_length=300)
     segundo_apellido = models.CharField(max_length=300)
     tipo_entrenamiento = models.CharField(max_length=300, default='Normal')
+    numero_de_telefono = models.CharField(max_length=300, default='')
+    notificado = models.BooleanField(default=False)
     fecha_ingreso = models.DateField(auto_now_add=True)
     ultimo_pago = models.DateField(blank=True, null=True)
     foto = models.ImageField(upload_to=f'images/')
@@ -16,9 +18,8 @@ class Cliente(models.Model):
     def get_dict(self):
         return {
             "ci": self.ci,
-            "edad": self.edad,
             "nombre": self.nombre,
-            "primer_appellido": self.primer_apellido,
+            "primer_apellido": self.primer_apellido,
             "segundo_apellido": self.segundo_apellido,
             "tipo_entrenamiento": self.tipo_entrenamiento,
             "fecha_ingreso": self.fecha_ingreso,

@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>1342</width>
-    <height>550</height>
+    <height>751</height>
    </rect>
   </property>
   <property name="maximumSize">
@@ -20,7 +20,11 @@
    <string>GyManager</string>
   </property>
   <property name="styleSheet">
-   <string notr="true">background-color: rgb(243, 243, 243);</string>
+   <string notr="true">background-color: rgb(49, 49, 49);
+background-image: url(:/image/image1.png);
+background-repeat: no-repeat;
+background-position: center;
+</string>
   </property>
   <property name="unifiedTitleAndToolBarOnMac">
    <bool>true</bool>
@@ -44,7 +48,7 @@
          </size>
         </property>
         <property name="styleSheet">
-         <string notr="true">background-color: white;
+         <string notr="true">background-color: rgb(218, 182, 0);
 border-radius: 12px;</string>
         </property>
         <property name="title">
@@ -288,7 +292,7 @@ border-color: black;
             <item>
              <widget class="QFrame" name="frame_2">
               <property name="styleSheet">
-               <string notr="true">background-color: white;
+               <string notr="true">background-color: rgb(218, 182, 0);
 border-radius: 12px;</string>
               </property>
               <property name="frameShape">
@@ -343,7 +347,7 @@ border-radius: 12px;</string>
             <item>
              <widget class="QFrame" name="frame_3">
               <property name="styleSheet">
-               <string notr="true">background-color: white;
+               <string notr="true">background-color: rgb(218, 182, 0);
 border-radius: 12px;</string>
               </property>
               <property name="frameShape">
@@ -398,7 +402,7 @@ border-radius: 12px;</string>
             <item>
              <widget class="QFrame" name="frame_4">
               <property name="styleSheet">
-               <string notr="true">background-color: white;
+               <string notr="true">background-color: rgb(218, 182, 0);
 border-radius: 12px;</string>
               </property>
               <property name="frameShape">
@@ -448,7 +452,7 @@ border-radius: 12px;</string>
              </sizepolicy>
             </property>
             <property name="styleSheet">
-             <string notr="true">background-color: white;
+             <string notr="true">background-color: rgb(49, 49, 49);
 border-radius: 12px;</string>
             </property>
             <property name="frameShape">
@@ -459,7 +463,18 @@ border-radius: 12px;</string>
             </property>
             <layout class="QVBoxLayout" name="verticalLayout_5">
              <item>
-              <widget class="QListWidget" name="deudors_list"/>
+              <widget class="QListWidget" name="deudors_list">
+               <property name="layoutDirection">
+                <enum>Qt::LeftToRight</enum>
+               </property>
+               <property name="styleSheet">
+                <string notr="true">background-color: rgb(49, 49, 49);
+</string>
+               </property>
+               <property name="frameShape">
+                <enum>QFrame::StyledPanel</enum>
+               </property>
+              </widget>
              </item>
             </layout>
            </widget>
@@ -3067,6 +3082,8 @@ border-radius: 12px;</string>
   <tabstop>deudors_list</tabstop>
   <tabstop>listWidget</tabstop>
  </tabstops>
- <resources/>
+ <resources>
+  <include location="image.qrc"/>
+ </resources>
  <connections/>
 </ui>
