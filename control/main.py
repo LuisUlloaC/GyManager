@@ -1,7 +1,7 @@
 import os
 import sys
 from PyQt5 import uic
-from PyQt5.QtWidgets import QShortcut, QApplication, QMainWindow, QFileDialog, QWidget, QListWidgetItem
+from PyQt5.QtWidgets import QShortcut, QApplication, QMainWindow, QFileDialog, QWidget, QListWidgetItem, QListWidget
 from PyQt5.QtCore import Qt, pyqtSignal
 from PyQt5.Qt import QPixmap
 from .states import States
@@ -19,12 +19,14 @@ class ClientListItem(QWidget):
     def __init__(self, client, assets_path):
         self.assets_path = assets_path
         super(ClientListItem, self).__init__()
-        uic.loadUi(self.get_assets("client_list_item.ui"), self)
+        uic.loadUi(self.get_assets("client_card_item.ui"), self)
         self.client = client
         picture_path = self.client['foto'].url[1:]
-        pixmap = QPixmap(self.get_media(picture_path))
-        pixmap = pixmap.scaled(self.list_item_picture.size(), Qt.KeepAspectRatio)
-        self.list_item_picture.setPixmap(pixmap)
+        picture_path = self.get_media(picture_path).replace("\\", "/")
+        self.list_item_picture.setStyleSheet("""
+                                              border-image:""" f'url({picture_path})'
+                                              """0 0 0 0;
+                                             """)
         self.name.setText(f'{self.client["nombre"]} {self.client["primer_apellido"]} {self.client["segundo_apellido"]}')
         self.training_type.setText(f'{self.client["tipo_entrenamiento"]}')
         self.date_joined.setText(f'{self.client["fecha_ingreso"]}')
@@ -41,6 +43,8 @@ class ClientListItem(QWidget):
     
     def get_media(self, file):
         media_path = os.getcwd()
+        media_path = media_path.replace("\\", "/")
+        print('La ruta: '+ os.path.join(media_path, file))
         return os.path.join(media_path, file)
 
     def handle_view_changed(self):
@@ -199,14 +203,14 @@ class Main(QMainWindow):
        self.clients_switch_screen.setCurrentIndex(self.states.views['clients_view'])
 
     def update_client_list(self):
-        print('updating.......')
         self.listWidget.clear()
         for client in self.states.data['client_list']:
             item_widget = ClientListItem(client, self.assets_path)
-            item = QListWidgetItem(self.listWidget)
-            self.listWidget.setItemWidget(item, item_widget)
             item_widget.view_changed.connect(self.handle_view_changed)
             item_widget.delete_client_signal.connect(self.delete_client)
+            list_item = QListWidgetItem(self.listWidget)
+            list_item.setSizeHint(item_widget.sizeHint())
+            self.listWidget.setItemWidget(list_item, item_widget)
 
 
 
