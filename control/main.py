@@ -1,9 +1,9 @@
 import os
 import sys
 from PyQt5 import uic
-from PyQt5.QtWidgets import QShortcut, QApplication, QMainWindow, QFileDialog, QWidget, QListWidgetItem, QListWidget
+from PyQt5.QtWidgets import QShortcut, QApplication, QMainWindow, QFileDialog, QWidget, QListWidgetItem, QLabel
 from PyQt5.QtCore import Qt, pyqtSignal
-from PyQt5.Qt import QPixmap
+from PyQt5.Qt import QPixmap, QPainter, QImage, QColor, QGraphicsOpacityEffect, QPalette, QGraphicsBlurEffect
 from .states import States
 from data.models import Cliente
 from django.core.files.uploadedfile import SimpleUploadedFile
@@ -80,6 +80,7 @@ class Main(QMainWindow):
         self.picture_edit.mousePressEvent = self.select_client_edit_picture
         self.accept_button.clicked.connect(self.create_client)
         self.decline_button.clicked.connect(self.goto_clients_list)
+        self.decline_button_edit.clicked.connect(self.goto_clients_list)
         ci_string_validator = CIValidator(self.error_ci)
         nombre_number_validator = InputsValidator(self.error_nombre)
         primer_apellido_number_validator = InputsValidator(self.error_primer_apellido)
@@ -98,9 +99,68 @@ class Main(QMainWindow):
         self.lineEdit_segundo_apellido_edit.setValidator(segundo_edit_apellido_number_validator)
         self.listWidget.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
         self.edit_button.clicked.connect(self.save_updated_client)
-        
+        self.setBackgroundBlur()
+        self.setCardBlur()
 
-    
+
+    def setBackgroundBlur(self):
+        background_path = self.get_media("views/ui/assets/background.svg").replace("\\","/")
+        self.setStyleSheet("""
+                           QMainWindow {
+                            background-image:""" f'url({background_path})'""";
+                            background-color: rgb(53, 53, 53);
+                            background-repeat: no-repeat;
+                            background-position: center;  
+                           }
+                           
+                            QPushButton {
+                                background-color: rgb(53, 53, 53);
+                                color: rgb(255,170,0);
+                                border-radius: 12px;
+                            }
+
+                            QLabel {
+                                color:rgb(255,170,0);
+                            }
+
+
+                            """)
+        self.background_widget = QWidget(self)
+        self.background_widget.setGeometry(self.rect())
+        self.background_widget.lower() 
+        self.background_widget.setAutoFillBackground(True)
+        palette = self.background_widget.palette()
+        palette.setColor(QPalette.Background, QColor(53,53,53,110))
+        self.background_widget.setPalette(palette)
+        self.background_widget.lower()
+        effect = QGraphicsBlurEffect()
+        effect.setBlurRadius(1)
+        effect.setBlurHints(QGraphicsBlurEffect.QualityHint)
+        self.background_widget.setGraphicsEffect(effect)
+
+    def setCardBlur(self):
+        self.frame_10.setAutoFillBackground(True)
+        palette = self.frame_10.palette()
+        palette.setColor(QPalette.Background, QColor(53,53,53,200))
+        self.frame_10.setPalette(palette)
+        self.frame_10.lower()
+        effect = QGraphicsBlurEffect()
+        effect.setBlurRadius(1)
+        effect.setBlurHints(QGraphicsBlurEffect.QualityHint)
+        self.frame_10.setGraphicsEffect(effect)
+        self.frame_7.setAutoFillBackground(True)
+        palette = self.frame_7.palette()
+        palette.setColor(QPalette.Background, QColor(53,53,53,200))
+        self.frame_7.setPalette(palette)
+        self.frame_7.lower()
+        effect = QGraphicsBlurEffect()
+        effect.setBlurRadius(1)
+        effect.setBlurHints(QGraphicsBlurEffect.QualityHint)
+        self.frame_7.setGraphicsEffect(effect)
+        
+    def resizeEvent(self, event):
+       self.background_widget.setGeometry(self.rect())
+       super().resizeEvent(event)
         
     def get_assets(self, file):
         return os.path.join(self.assets_path, file)
@@ -197,11 +257,8 @@ class Main(QMainWindow):
                                               """0 0 0 0;
                                              """)
 
-
     def save_updated_client(self):
         client = Cliente.objects.get(ci=self.editing_client_ci)
-        print(self.creating_client_edit_picture)
-
         if not self.lineEdit_ci_edit.hasAcceptableInput() and not \
             self.lineEdit_nombre_edit.hasAcceptableInput() and not \
             self.lineEdit_primer_apellido_edit.hasAcceptableInput() and not \
@@ -223,21 +280,19 @@ class Main(QMainWindow):
         try:
             client = Cliente.objects.get(ci=value)
             client.delete()
-            self.states.reload_client_list()
             self.update_client_list()
         except Cliente.DoesNotExist:
             print("Client not found")
         except Exception as err:
             print(f'An error occurred: {err}')
 
-
     def handle_view_changed(self, index, ci_value):
        self.states.views['clients_view'] = index
        self.clients_switch_screen.setCurrentIndex(self.states.views['clients_view'])
        self.set_client_values_to_edit(ci_value)
 
-
     def update_client_list(self):
+        self.states.reload_client_list()
         self.listWidget.clear()
         for client in self.states.data['client_list']:
             item_widget = ClientListItem(client, self.assets_path)
@@ -291,3 +346,6 @@ def start_app(assets_path, debug=False):
 
     mainWin.showMaximized()
     sys.exit(app.exec_())
+
+
+# cambiar ui del la card 

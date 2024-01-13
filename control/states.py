@@ -15,7 +15,6 @@ class States:
         self.data['client_list']=client_list_dict
 
     def reload_client_list(self):
-        print('reloading...')
         client_list = Cliente.objects.all()
         client_list_dict = []
         for client in client_list:
