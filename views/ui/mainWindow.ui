@@ -137,6 +137,10 @@
   <property name="windowTitle">
    <string>GyManager</string>
   </property>
+  <property name="windowIcon">
+   <iconset>
+    <normaloff>assets/background.svg</normaloff>assets/background.svg</iconset>
+  </property>
   <property name="autoFillBackground">
    <bool>false</bool>
   </property>

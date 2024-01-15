@@ -56,7 +56,35 @@ class ClientListItem(QWidget):
         self.view_changed.emit(2, self.client['ci'])
 
     def handle_delete_client(self):
-        self.delete_client_signal.emit(self.client['ci'])
+        msg = QMessageBox()
+        msg.setWindowTitle("Confirmaión")
+        msg.setIcon(QMessageBox.Question)
+        msg.setText("Está a punto de eliminar un cliente. Continuar?")
+        msg.setStandardButtons(QMessageBox.Yes | QMessageBox.No)
+        msg.setDefaultButton(QMessageBox.No)
+        msg.setEscapeButton(QMessageBox.No)
+        msg.setStyleSheet("""
+  QMessageBox {
+      color: rgb(255,170,0);
+      background-color: rgb(53,53,53);
+  }
+  QDialogButtonBox {
+      background-color: green;
+  }
+  QMessageBox QPushButton {
+      color: rgb(255,170,0);
+      background-color: rgb(53,53,53);
+      border: none;
+  }
+  QMessageBox QPushButton:hover {
+      background-color: rgb(72,72,72);
+  }
+""")
+
+        retval = msg.exec_()
+        if retval == QMessageBox.Yes:
+            self.delete_client_signal.emit(self.client['ci'])
+
 
 
 class DeudorListItem(QWidget):
@@ -554,39 +582,14 @@ class Main(QMainWindow):
             self.update_client_list()
 
     def delete_client(self, value):
-        reply = QMessageBox()
-
-        reply.setStyleSheet("""
-        QMessageBox {
-            color: rgb(255,170,0);
-            background-color: rgb(53,53,53);
-        }
-        QDialogButtonBox {
-            background-color: green;
-        }
-        QMessageBox QPushButton {
-            color: rgb(255,170,0);
-            background-color: rgb(53,53,53);
-            border: none;
-        }
-        QMessageBox QPushButton:hover {
-            background-color: rgb(72,72,72);
-        }
-   """) 
-        result = reply.question(self, 'Aviso', 'Está a punto de eliminar un cliente. Continuar?',
-                               QMessageBox.Yes | QMessageBox.No, QMessageBox.No)
+        try:
+            client = Cliente.objects.get(ci=value)
+            client.foto.delete()
+            client.delete()
+            self.update_client_list()
+        except Cliente.DoesNotExist:
+            print("Client not found")
         
-        if result == QMessageBox.Yes:
-            try:
-                client = Cliente.objects.get(ci=value)
-                client.foto.delete()
-                client.delete()
-                self.update_client_list()
-            except Cliente.DoesNotExist:
-                print("Client not found")
-            except Exception as err:
-                print(f'An error occurred: {err}')
-
     def handle_view_changed(self, index, ci_value):
         self.reset_values()
         if self.credentials == 'admin':
