@@ -4,9 +4,9 @@ import sys
 from PyQt5 import uic
 from PyQt5.QtWidgets import QShortcut, QApplication, QMainWindow, QFileDialog, QWidget, QListWidgetItem, QLabel, QListWidget, QToolBox, QDialog
 from PyQt5.QtCore import Qt, pyqtSignal
-from PyQt5.Qt import QColor, QPalette, QGraphicsBlurEffect, QIcon, QPixmap
+from PyQt5.Qt import QColor, QPalette, QGraphicsBlurEffect, QIcon, QMessageBox
 from .states import States
-from data.models import Cliente, BackgroundImage
+from data.models import Cliente
 from django.core.files.uploadedfile import SimpleUploadedFile
 
 #dev
@@ -18,13 +18,12 @@ class ClientListItem(QWidget):
     view_changed = pyqtSignal(int, str)
     delete_client_signal = pyqtSignal(str)
 
-    def __init__(self, client, assets_path):
+    def __init__(self, client, assets_path, credentials):
         self.assets_path = assets_path
         super(ClientListItem, self).__init__()
         uic.loadUi(self.get_assets("client_card_item.ui"), self)
         self.client = client
         picture_path = self.client['foto'].url[1:]
-        print(picture_path+'   aaaaaaaaaa')
         picture_path = self.get_media(picture_path).replace("\\", "/")
         self.list_item_picture.setStyleSheet("""
                                               border-image:""" f'url({picture_path})'
@@ -39,7 +38,10 @@ class ClientListItem(QWidget):
             self.last_pay.setText(f'{self.client["ultimo_pago"]}')
         self.phone_number.setText(f'{self.client["numero_de_telefono"]}')
         self.edit_button.clicked.connect(self.handle_view_changed)
-        self.delete_button.clicked.connect(self.handle_delete_client)
+        if credentials == 'admin':
+            self.delete_button.clicked.connect(self.handle_delete_client)
+        else:
+            self.delete_button.hide()
 
 
     def get_assets(self, file):
@@ -163,7 +165,9 @@ class Main(QMainWindow):
         self.accept_button.clicked.connect(self.create_client)
         self.accept_button_admin.clicked.connect(self.create_client_as_admin)
         self.decline_button.clicked.connect(self.goto_clients_list)
+        self.decline_button_admin.clicked.connect(self.goto_clients_list)
         self.decline_button_edit.clicked.connect(self.goto_clients_list)
+        self.decline_button_admin_edit.clicked.connect(self.goto_clients_list)
 
         ci_string_validator = CIValidator(self.error_ci)
         telefono_string_validator = TelefonoValidator(self.error_telefono)
@@ -235,7 +239,7 @@ class Main(QMainWindow):
         self.setStyleSheet(
             """
             QMainWindow { 
-                background-image:url('./views/ui/assets/background.svg');
+                background-image:url('./_internal/views/ui/assets/background.svg');
                 background-color: rgb(53, 53, 53);
                 background-repeat: no-repeat;
                 background-position: center; 
@@ -260,31 +264,21 @@ class Main(QMainWindow):
         self.background_widget.setPalette(palette)
         self.background_widget.lower()
         effect = QGraphicsBlurEffect()
-        effect.setBlurRadius(1)
+        effect.setBlurRadius(10)
         effect.setBlurHints(QGraphicsBlurEffect.QualityHint)
         self.background_widget.setGraphicsEffect(effect)
     
-    def setCardCreateBlur(self):
-        self.frame_10.setAutoFillBackground(True)
-        palette = self.frame_10.palette()
-        palette.setColor(QPalette.Background, QColor(53,53,53,200))
-        self.frame_10.setPalette(palette)
-        self.frame_10.lower()
-        effect = QGraphicsBlurEffect()
-        effect.setBlurRadius(1)
-        effect.setBlurHints(QGraphicsBlurEffect.QualityHint)
-        self.frame_10.setGraphicsEffect(effect)
 
-    def setCardEditBlur(self):
-        self.frame_7.setAutoFillBackground(True)
-        palette = self.frame_7.palette()
+    def setCardBlur(self, frame):
+        frame.setAutoFillBackground(True)
+        palette = frame.palette()
         palette.setColor(QPalette.Background, QColor(53,53,53,200))
-        self.frame_7.setPalette(palette)
-        self.frame_7.lower()
+        frame.setPalette(palette)
+        frame.lower()
         effect = QGraphicsBlurEffect()
         effect.setBlurRadius(1.5)
         effect.setBlurHints(QGraphicsBlurEffect.QualityHint)
-        self.frame_7.setGraphicsEffect(effect)
+        frame.setGraphicsEffect(effect)
         
     def resizeEvent(self, event):
        self.background_widget.setGeometry(self.rect())
@@ -309,6 +303,7 @@ class Main(QMainWindow):
         return os.path.join(media_path, file)
 
     def goto_home(self):
+        self.reset_values()
         self.clients_button.setStyleSheet("")
         self.home_button.setStyleSheet("""
                                         border-style:solid;
@@ -320,6 +315,7 @@ class Main(QMainWindow):
         self.switch_screen.setCurrentIndex(self.states.views['main_view'])
 
     def goto_clients(self):
+        self.reset_values()
         self.home_button.setStyleSheet("")
         self.clients_button.setStyleSheet("""
                                             border-style:solid;
@@ -333,16 +329,18 @@ class Main(QMainWindow):
         self.clients_switch_screen.setCurrentIndex(self.states.views['clients_view'])
 
     def goto_clients_list(self):
+        self.reset_values()
         self.update_client_list()
         self.states.views['clients_view']=0
         self.clients_switch_screen.setCurrentIndex(self.states.views['clients_view'])
 
     def goto_client_creation_form(self):
-        self.setCardCreateBlur()
         if self.credentials == 'admin':
+            self.setCardBlur(self.frame_14)
             self.states.views['clients_view']=3
             self.clients_switch_screen.setCurrentIndex(self.states.views['clients_view'])
         else:
+            self.setCardBlur(self.frame_7)
             self.states.views['clients_view']=1
             self.clients_switch_screen.setCurrentIndex(self.states.views['clients_view'])
     
@@ -384,8 +382,7 @@ class Main(QMainWindow):
                 self.creating_client_edit_picture = filename
                 self.picture_admin_edit.setStyleSheet(f"""
                                               border-image: url({filename})0 0 0 0;
-                                             """)
-        
+                                             """)  
     
     def create_client(self):
         is_valid = True
@@ -418,7 +415,6 @@ class Main(QMainWindow):
                 self.error_ci.setText('Ya existe un cliente con ese carné de identidad')
                 self.error_ci.show()
 
-                
     def create_client_as_admin(self):
         is_valid = True
         fecha_ingreso = self.fecha_entrada_admin.date()
@@ -500,6 +496,7 @@ class Main(QMainWindow):
             self.lineEdit_segundo_apellido_edit.hasAcceptableInput():
             if self.creating_client_edit_picture is not None:
                 with open(self.creating_client_edit_picture, 'rb') as picture:
+                    client.foto.delete()
                     uploaded_file = SimpleUploadedFile(picture.name, picture.read(), content_type='image/jpeg')
                     client.ci = self.lineEdit_ci_edit.text()
                     client.nombre = self.lineEdit_nombre_edit.text()
@@ -532,6 +529,7 @@ class Main(QMainWindow):
             self.lineEdit_segundo_apellido_admin_edit.hasAcceptableInput():
             if self.creating_client_edit_picture is not None:
                 with open(self.creating_client_edit_picture, 'rb') as picture:
+                    client.foto.delete()
                     uploaded_file = SimpleUploadedFile(picture.name, picture.read(), content_type='image/jpeg')
                     client.ci = self.lineEdit_ci_admin_edit.text()
                     client.nombre = self.lineEdit_nombre_admin_edit.text()
@@ -556,22 +554,48 @@ class Main(QMainWindow):
             self.update_client_list()
 
     def delete_client(self, value):
-        try:
-            client = Cliente.objects.get(ci=value)
-            client.delete()
-            self.update_client_list()
-        except Cliente.DoesNotExist:
-            print("Client not found")
-        except Exception as err:
-            print(f'An error occurred: {err}')
+        reply = QMessageBox()
+
+        reply.setStyleSheet("""
+        QMessageBox {
+            color: rgb(255,170,0);
+            background-color: rgb(53,53,53);
+        }
+        QDialogButtonBox {
+            background-color: green;
+        }
+        QMessageBox QPushButton {
+            color: rgb(255,170,0);
+            background-color: rgb(53,53,53);
+            border: none;
+        }
+        QMessageBox QPushButton:hover {
+            background-color: rgb(72,72,72);
+        }
+   """) 
+        result = reply.question(self, 'Aviso', 'Está a punto de eliminar un cliente. Continuar?',
+                               QMessageBox.Yes | QMessageBox.No, QMessageBox.No)
+        
+        if result == QMessageBox.Yes:
+            try:
+                client = Cliente.objects.get(ci=value)
+                client.foto.delete()
+                client.delete()
+                self.update_client_list()
+            except Cliente.DoesNotExist:
+                print("Client not found")
+            except Exception as err:
+                print(f'An error occurred: {err}')
 
     def handle_view_changed(self, index, ci_value):
-        self.setCardEditBlur()
+        self.reset_values()
         if self.credentials == 'admin':
+            self.setCardBlur(self.frame_17)
             self.states.views['clients_view'] = 4
             self.clients_switch_screen.setCurrentIndex(self.states.views['clients_view'])
             self.set_client_values_to_edit_as_admin(ci_value)
         else:
+            self.setCardBlur(self.frame_10)
             self.states.views['clients_view'] = index
             self.clients_switch_screen.setCurrentIndex(self.states.views['clients_view'])
             self.set_client_values_to_edit(ci_value)
@@ -598,10 +622,10 @@ class Main(QMainWindow):
             client.deudor = False
             client.notificado = False 
             client.save()
-            self.update_client_list()
         except Exception as err:
             print(f'{err}')
-
+        finally:
+            self.update_all_data()
 
     def update_client_list(self):
         self.listWidget.clear()
@@ -610,7 +634,7 @@ class Main(QMainWindow):
         self.total_unpaids.setText(str(self.states.data['unpaids_amount']))
         self.total_notify.setText(str(self.states.data['notify_amount']))
         for client in self.states.data['client_list']:
-            item_widget = ClientListItem(client, self.assets_path)
+            item_widget = ClientListItem(client, self.assets_path, self.credentials)
             item_widget.view_changed.connect(self.handle_view_changed)
             item_widget.delete_client_signal.connect(self.delete_client)
             list_item = QListWidgetItem(self.listWidget)
@@ -638,6 +662,29 @@ class Main(QMainWindow):
             list_item = QListWidgetItem(self.notify_list)
             list_item.setSizeHint(item_widget.sizeHint())
             self.notify_list.setItemWidget(list_item, item_widget)
+
+    def reset_values(self):
+        # Reset line edits
+        self.lineEdit_ci.clear()
+        self.lineEdit_telefono.clear()
+        self.lineEdit_nombre.clear()
+        self.lineEdit_primer_apellido.clear()
+        self.lineEdit_segundo_apellido.clear()
+
+        # Admin
+        self.lineEdit_ci_admin.clear()
+        self.lineEdit_telefono_admin.clear()
+        self.lineEdit_nombre_admin.clear()
+        self.lineEdit_primer_apellido_admin.clear()
+        self.lineEdit_segundo_apellido_admin.clear()
+
+        # Reset pictures
+        self.creating_client_picture=None
+        self.creating_client_edit_picture=None
+        self.picture.clear()
+        self.picture_edit.clear()
+        self.picture_admin.clear()
+        self.picture_admin_edit.clear()
 
 
 
@@ -686,37 +733,11 @@ def start_app(assets_path, debug=False):
     if debug:
         dev = DevDialog(states)
         stdout = sys.stdout
-        print("stdout -> dev window")
         sys.stdout = dev
-        print("stdout -> dev window")
         app.dev = dev
         return app
 
     mainWin = Session(states)
     states.views["mainWin"] = mainWin
-
-    def callback():
-        dev = DevDialog(states)
-        stdout = sys.stdout
-        print("stdout -> dev window")
-        sys.stdout = dev
-        print("stdout -> dev window")
-        dev.context = dev_shortcut.parent()
-        dev.exec()
-        sys.stdout = stdout
-        print("stdout -> sys.stdout")
-
-
-    dev_shortcut = QShortcut("Ctrl+Alt+D", mainWin)
-    states.dev_shortcut = dev_shortcut
-    dev_shortcut.setContext(Qt.ApplicationShortcut)
-    dev_shortcut.activated.connect(callback)
-
-    @app.focusChanged.connect
-    def change(old, new):
-        if new:
-            if not isinstance(new.window(), DevDialog):
-                dev_shortcut.setParent(new.window())
-
     mainWin.show()
     sys.exit(app.exec_())

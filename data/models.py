@@ -55,5 +55,3 @@ class Cliente(models.Model):
             "foto": self.foto
         }
 
-class BackgroundImage(models.Model):
-    image=models.ImageField(upload_to=f'bg/')
