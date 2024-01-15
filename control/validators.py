@@ -37,3 +37,22 @@ class CIValidator(QtGui.QValidator):
            self.label.setText("Este campo está vacío")
            self.label.show()
            return QtGui.QValidator.Intermediate, string, position
+       
+class TelefonoValidator(QtGui.QValidator):
+   def __init__(self, label):
+       super().__init__()
+       self.label = label
+
+   def validate(self, string, position):
+       if string.strip() != "":
+           if not QtCore.QRegExp('^\d+$').exactMatch(string):
+               self.label.setText("El campo debe contener solo dígitos")
+               self.label.show()
+               return QtGui.QValidator.Acceptable, string, position
+           else:
+               self.label.hide()
+               return QtGui.QValidator.Intermediate, string, position
+       else:
+           self.label.setText("Este campo está vacío")
+           self.label.show()
+           return QtGui.QValidator.Intermediate, string, position

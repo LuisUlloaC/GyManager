@@ -1,6 +1,0 @@
-<RCC>
-  <qresource prefix="fg">
-    <file>background.svg</file>
-    <file>images.jpeg</file>
-  </qresource>
-</RCC>
