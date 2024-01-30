@@ -4,7 +4,7 @@ import sys
 from PyQt5 import uic
 from PyQt5.QtWidgets import QShortcut, QApplication, QMainWindow, QFileDialog, QWidget, QListWidgetItem, QLabel, QListWidget, QToolBox, QDialog
 from PyQt5.QtCore import Qt, pyqtSignal
-from PyQt5.Qt import QColor, QPalette, QGraphicsBlurEffect, QIcon, QMessageBox
+from PyQt5.Qt import QColor, QPalette, QGraphicsBlurEffect, QIcon, QMessageBox, QPixmap, QTime
 from .states import States
 from data.models import Cliente
 from django.core.files.uploadedfile import SimpleUploadedFile
@@ -18,7 +18,7 @@ class ClientListItem(QWidget):
     view_changed = pyqtSignal(int, str)
     delete_client_signal = pyqtSignal(str)
 
-    def __init__(self, client, assets_path, credentials):
+    def __init__(self, client, assets_path, credentials, theme):
         self.assets_path = assets_path
         super(ClientListItem, self).__init__()
         uic.loadUi(self.get_assets("client_card_item.ui"), self)
@@ -32,6 +32,11 @@ class ClientListItem(QWidget):
         self.name.setText(f'{self.client["nombre"]} {self.client["primer_apellido"]} {self.client["segundo_apellido"]}')
         self.training_type.setText(f'{self.client["tipo_entrenamiento"]}')
         self.date_joined.setText(f'{self.client["fecha_ingreso"]}')
+        if self.client["horario"] == '':
+            self.horario.setText('-')
+        else:
+            self.horario.setText(f'{self.client["horario"]}')
+        
         if self.client["ultimo_pago"] == None:
             self.last_pay.setText(f'-')
         else:
@@ -42,6 +47,14 @@ class ClientListItem(QWidget):
             self.delete_button.clicked.connect(self.handle_delete_client)
         else:
             self.delete_button.hide()
+        self.setStyleSheet("""
+            QFrame {
+                border-style: solid;
+                border-width:1px;
+                border-color:black;
+                border-radius: 5px;	
+            }
+                           """)
 
 
     def get_assets(self, file):
@@ -57,29 +70,14 @@ class ClientListItem(QWidget):
 
     def handle_delete_client(self):
         msg = QMessageBox()
-        msg.setWindowTitle("Confirmaión")
+        msg.setWindowTitle("Confirmación")
         msg.setIcon(QMessageBox.Question)
         msg.setText("Está a punto de eliminar un cliente. Continuar?")
         msg.setStandardButtons(QMessageBox.Yes | QMessageBox.No)
         msg.setDefaultButton(QMessageBox.No)
         msg.setEscapeButton(QMessageBox.No)
-        msg.setStyleSheet("""
-  QMessageBox {
-      color: rgb(255,170,0);
-      background-color: rgb(53,53,53);
-  }
-  QDialogButtonBox {
-      background-color: green;
-  }
-  QMessageBox QPushButton {
-      color: rgb(255,170,0);
-      background-color: rgb(53,53,53);
-      border: none;
-  }
-  QMessageBox QPushButton:hover {
-      background-color: rgb(72,72,72);
-  }
-""")
+        msg.button(QMessageBox.Yes).setText("Sí, estoy seguro")
+        msg.button(QMessageBox.No).setText("Cancelar")
 
         retval = msg.exec_()
         if retval == QMessageBox.Yes:
@@ -90,23 +88,31 @@ class ClientListItem(QWidget):
 class DeudorListItem(QWidget):
     marcar_notificado_signal = pyqtSignal(bool, str)
     cobrar_deuda_signal = pyqtSignal(str)
-    def __init__(self, client, assets_path):
+    def __init__(self, client, assets_path, theme):
         self.assets_path = assets_path
         super(DeudorListItem, self).__init__()
         uic.loadUi(self.get_assets("deudor_card_item.ui"), self)
         self.notificado.setStyleSheet("""
                                         QCheckBox::indicator {
-                                                background-color: rgb(53,53,53);
+                                                background-color: white;
                                                 border-style:solid;
                                                 border-width:1px;
-                                                border-color: rgb(255,170,0);
+                                                border-color: black;
                                                 border-radius:5px;
                                         }
                                         QCheckBox::indicator:checked {
-                                            background-color: rgb(255,170,0);
+                                            background-color: green;
                                         }
 
                                         """)
+        self.setStyleSheet("""
+            QFrame {
+                border-style: solid;
+                border-width:1px;
+                border-color:black;
+                border-radius: 8px;	
+            }
+                           """)
         self.client = client
         picture_path = self.client['foto'].url[1:]
         picture_path = self.get_media(picture_path).replace("\\", "/")
@@ -118,6 +124,7 @@ class DeudorListItem(QWidget):
         self.name_deudor.setText(f'{self.client["nombre"]} {self.client["primer_apellido"]} {self.client["segundo_apellido"]}')
         self.training_type_deudor.setText(f'{self.client["tipo_entrenamiento"]}')
         self.phone_number_deudor.setText(f'{self.client["numero_de_telefono"]}')
+        self.horario.setText(f'{self.client["horario"]}')
         if self.client["ultimo_pago"] == None:
             self.last_pay_deudor.setText(f'-')
         else:
@@ -150,6 +157,9 @@ class Main(QMainWindow):
         super(Main, self).__init__()
         uic.loadUi(self.get_assets("mainWindow.ui"), self)
         self.setWindowTitle("GyManager")
+        self.setWindowIcon(QIcon('./_internal/views/ui/assets/background dark.ico'))
+        self.theme_dark = False
+        self.change_color_mode()
         self.editing_client_ci = 0
         self.creating_client_picture = None
         self.creating_client_edit_picture = None
@@ -259,36 +269,290 @@ class Main(QMainWindow):
         self.home_button.setStyleSheet("""
                                         border-style:solid;
                                         border-width:1px;
-                                        border-color:rgb(255,170,0);
+                                        border-color:black;
                                             """)
+        self.theme.clicked.connect(self.change_color_mode)
 
+    def change_color_mode(self):
+        self.theme_dark = not self.theme_dark
+        pixmap_light = './_internal/views/ui/assets/luna.png'
+        pixmap_dark = './_internal/views/ui/assets/sol.png'
+        plus = './_internal/views/ui/assets/plus.png'
+
+        self.picture.setStyleSheet(f"""
+                                   background-image : url({plus}) 0 0 0 0;
+                                   background-repeat: no-repeat;
+                                   background-position: center;
+                                   """)
+        self.picture_edit.setStyleSheet(f"""
+                                   background-image : url({plus}) 0 0 0 0;
+                                   background-repeat: no-repeat;
+                                   background-position: center;
+                                   """)
+        self.picture_admin.setStyleSheet(f"""
+                                   background-image : url({plus}) 0 0 0 0;
+                                   background-repeat: no-repeat;
+                                   background-position: center;
+                                   """)
+        self.picture_admin_edit.setStyleSheet(f"""
+                                   background-image : url({plus}) 0 0 0 0;
+                                   background-repeat: no-repeat;
+                                   background-position: center;
+                                   """)
+        self.timeEdit_horario.setStyleSheet("""
+            QTimeEdit {
+       border-style: solid;
+       border-width:1px;
+       border-color: black;
+       background-color: transparent;
+       border-radius: 12px;
+       padding: 5px;
+   }        
+        """)
+        self.timeEdit_horario_edit.setStyleSheet("""
+            QTimeEdit {
+       border-style: solid;
+       border-width:1px;
+       border-color: black;
+       background-color: transparent;
+       border-radius: 12px;
+       padding: 5px;
+   }        
+        """)
+        self.timeEdit_horario_admin.setStyleSheet("""
+            QTimeEdit {
+       border-style: solid;
+       border-width:1px;
+       border-color: black;
+       background-color: transparent;
+       border-radius: 12px;
+       padding: 5px;
+   }        
+        """)
+        self.timeEdit_horario_admin_edit.setStyleSheet("""
+            QTimeEdit {
+       border-style: solid;
+       border-width:1px;
+       border-color: black;
+       background-color: transparent;
+       border-radius: 12px;
+       padding: 5px;
+   }        
+        """)
+        if self.theme_dark:
+            self.theme.setStyleSheet(f"border-image : url({pixmap_dark}) 0 0 0 0;")
+
+        else:
+            self.theme.setStyleSheet(f"border-image : url({pixmap_light}) 0 0 0 0;")
+
+        if self.theme_dark:
+            self.setStyleSheet(
+                """
+                QMainWindow { 
+                    background-image:url('./_internal/views/ui/assets/background_dark.svg');
+                    background-color: gray;
+                    background-repeat: no-repeat;
+                    background-position: center; 
+                }
+
+                QPushButton {
+                    background-color: transparent;
+                    color: white;
+                    border-radius: 12px;
+                }
+
+                QLabel {
+                    color: white;
+                }
+
+                QFrame {
+                    background-color: white;
+                    border-radius: 5px;
+                }
+
+                QToolBox::tab {
+                    color: white;
+                    background-color:rgba(200, 200, 200, 50);
+                    border-radius: 10px;
+                    border: none;
+                }
+
+
+                """)
+            self.switch_screen.setStyleSheet("""
+                background-color: transparent;
+                QPushButton {
+                    background-color: transparent;
+                    color: white;
+                    border-radius: 12px;
+                }
+
+                QLabel {
+                    color:gray;
+                }
+                                             
+                QFrame {
+                    background-color: gray;
+                    border-radius: 12px;
+                }
+                                             
+                QLineEdit {
+                    border-radius: 12px;
+                    color:white;
+                }
+            """)
+            self.frame_7.setStyleSheet("""
+                background-color: gray;
+                border-radius: 12px;
+                border-style: solid;
+                border-width:1px;
+                border-color: black;
+                color: black;
+                """)
+            self.frame_10.setStyleSheet("""
+                background-color: gray;
+                border-radius: 12px;
+                border-style: solid;
+                border-width:1px;
+                border-color: black;
+                color: black;
+                """)
+            self.frame_14.setStyleSheet("""
+                background-color: gray;
+                border-radius: 12px;
+                border-style: solid;
+                border-width:1px;
+                border-color: black;
+                color: black;
+                """)
+            self.frame_17.setStyleSheet("""
+                background-color: gray;
+                border-radius: 12px;
+                border-style: solid;
+                border-width:1px;
+                border-color: black;
+                color: black;
+                """)
+            self.frame.setStyleSheet("""
+                                     QFrame{
+                                        border-style:solid;
+                                        border-right-width:1px;
+                                        border-right-color: gray;
+                                        background-color: gray;
+                                     }
+                """)
+            home_button = self.home_button.styleSheet()
+            self.home_button.setStyleSheet(home_button.replace("black", "white"))
+            self.clients_button.setStyleSheet(home_button.replace("black", "white"))
+        else:
+            self.setStyleSheet(
+                """
+                QMainWindow { 
+                    background-image:url('./_internal/views/ui/assets/background_light.svg');
+                    background-color: rgb(248, 248, 248);
+                    background-repeat: no-repeat;
+                    background-position: center; 
+                }
+
+                QPushButton {
+                    background-color: transparent;
+                    color: black;
+                    border-radius: 12px;
+                }
+
+                QLabel {
+                    color: black;
+                }
+
+                QFrame {
+                    background-color: rgb(240, 240, 240);
+                    border-radius: 5px;
+                }
+
+                QToolBox::tab {
+                    color: black;
+                    background-color:rgba(122, 122, 122, 50);
+                    border-radius: 10px;
+                    border: none;
+                }
+
+
+                """)
+            self.switch_screen.setStyleSheet("""
+                background-color: transparent;
+                QPushButton {
+                    background-color: rgb(210, 210, 210);
+                    color: black;
+                    border-radius: 12px;
+                }
+
+                QLabel {
+                    color:black;
+                }
+                                             
+                QFrame {
+                    background-color: rgb(210, 210, 210);
+                    border-radius: 12px;
+                }
+                                             
+                QLineEdit {
+                    border-radius: 12px;
+                    color:black;
+                }
+            """)
+            self.frame_7.setStyleSheet("""
+                background-color: rgb(210, 210, 210);
+                border-radius: 12px;
+                border-style: solid;
+                border-width:1px;
+                border-color: black;
+                color: black;
+                """)
+            self.frame_10.setStyleSheet("""
+                background-color: rgb(210, 210, 210);
+                border-radius: 12px;
+                border-style: solid;
+                border-width:1px;
+                border-color: black;
+                color: black;
+                """)
+            self.frame_14.setStyleSheet("""
+                background-color: rgb(210, 210, 210);
+                border-radius: 12px;
+                border-style: solid;
+                border-width:1px;
+                border-color: black;
+                color: black;
+                """)
+            self.frame_17.setStyleSheet("""
+                background-color: rgb(210, 210, 210);
+                border-radius: 12px;
+                border-style: solid;
+                border-width:1px;
+                border-color: black;
+                color: black;
+                """)
+            self.frame.setStyleSheet("""
+                                     QFrame{
+                                        border-style:solid;
+                                        border-right-width:1px;
+                                        border-right-color: gray;
+                                     }
+                """)
+            home_button = self.home_button.styleSheet()
 
     def setBackgroundBlur(self):
-        self.setStyleSheet(
-            """
-            QMainWindow { 
-                background-image:url('./_internal/views/ui/assets/background.svg');
-                background-color: rgb(53, 53, 53);
-                background-repeat: no-repeat;
-                background-position: center; 
-            }
-
-            QPushButton {
-                background-color: rgb(53, 53, 53);
-                color: rgb(255,170,0);
-                border-radius: 12px;
-            }
-
-            QLabel {
-                color:rgb(255,170,0);
-            }
-            """)
+        self.change_color_mode()
         self.background_widget = QWidget(self)
         self.background_widget.setGeometry(self.rect())
         self.background_widget.lower() 
         self.background_widget.setAutoFillBackground(True)
         palette = self.background_widget.palette()
-        palette.setColor(QPalette.Background, QColor(53,53,53,110))
+        if self.theme_dark == False:
+            palette.setColor(QPalette.Background, QColor(150,150,150,110))
+        elif self.theme_dark == True:
+            palette.setColor(QPalette.Background, QColor(255,255,255,110))
+
         self.background_widget.setPalette(palette)
         self.background_widget.lower()
         effect = QGraphicsBlurEffect()
@@ -298,13 +562,12 @@ class Main(QMainWindow):
     
 
     def setCardBlur(self, frame):
-        frame.setAutoFillBackground(True)
         palette = frame.palette()
-        palette.setColor(QPalette.Background, QColor(53,53,53,200))
+        palette.setColor(QPalette.Background, QColor(238,238,238,10))
         frame.setPalette(palette)
         frame.lower()
         effect = QGraphicsBlurEffect()
-        effect.setBlurRadius(1.5)
+        effect.setBlurRadius(1)
         effect.setBlurHints(QGraphicsBlurEffect.QualityHint)
         frame.setGraphicsEffect(effect)
         
@@ -336,7 +599,7 @@ class Main(QMainWindow):
         self.home_button.setStyleSheet("""
                                         border-style:solid;
                                         border-width:1px;
-                                        border-color:rgb(255,170,0);
+                                        border-color:black;
                                             """)
         self.update_all_data()
         self.states.views['main_view']=0
@@ -348,7 +611,7 @@ class Main(QMainWindow):
         self.clients_button.setStyleSheet("""
                                             border-style:solid;
                                             border-width:1px;
-                                            border-color:rgb(255,170,0);
+                                            border-color:black;
                                             """)
         self.update_all_data()
         self.states.views['main_view']=1
@@ -436,6 +699,7 @@ class Main(QMainWindow):
                         segundo_apellido = self.lineEdit_segundo_apellido.text(),
                         tipo_entrenamiento = self.tipo_entrenamiento.currentText(),
                         numero_de_telefono= self.lineEdit_telefono.text(),
+                        horario= self.timeEdit_horario.time().toString(),
                         foto = uploaded_file,
                     )
                 self.goto_clients_list()
@@ -473,6 +737,7 @@ class Main(QMainWindow):
                         numero_de_telefono= self.lineEdit_telefono_admin.text(),
                         fecha_ingreso = fecha_ingreso_datetime,
                         ultimo_pago = ultimo_pago_datetime,
+                        horario= self.timeEdit_horario_admin.time().toString(),
                         foto = uploaded_file,
                     )
                 self.goto_clients_list()
@@ -489,6 +754,8 @@ class Main(QMainWindow):
         self.lineEdit_segundo_apellido_edit.setText(client.segundo_apellido)
         self.tipo_entrenamiento_edit.setCurrentText(client.tipo_entrenamiento)
         self.lineEdit_telefono_edit.setText(client.numero_de_telefono)
+        self.timeEdit_horario_admin_edit.setTime(QTime.fromString(client.horario,"hh:mm:ss"))
+
         self.picture_edit.clear()
         picture_path = client.foto.url[1:]
         picture_path = self.get_media(picture_path).replace("\\", "/")
@@ -508,6 +775,7 @@ class Main(QMainWindow):
         self.lineEdit_telefono_admin_edit.setText(client.numero_de_telefono)
         self.fecha_entrada_admin_edit.setDate(client.fecha_ingreso)
         self.ultimo_pago_admin_edit.setDate(client.ultimo_pago)
+        self.timeEdit_horario_admin_edit.setTime(QTime.fromString(client.horario,"hh:mm:ss"))
         self.picture_admin_edit.clear()
         picture_path = client.foto.url[1:]
         picture_path = self.get_media(picture_path).replace("\\", "/")
@@ -532,6 +800,7 @@ class Main(QMainWindow):
                     client.segundo_apellido = self.lineEdit_segundo_apellido_edit.text()
                     client.tipo_entrenamiento = self.tipo_entrenamiento_edit.currentText()
                     client.numero_de_telefono = self.lineEdit_telefono_edit.text()
+                    client.horario = self.timeEdit_horario_edit.time().toString()
                     client.foto = uploaded_file
             else:
                 client.ci = self.lineEdit_ci_edit.text()
@@ -540,6 +809,7 @@ class Main(QMainWindow):
                 client.segundo_apellido = self.lineEdit_segundo_apellido_edit.text()
                 client.tipo_entrenamiento = self.tipo_entrenamiento_edit.currentText()
                 client.numero_de_telefono = self.lineEdit_telefono_edit.text()
+                client.horario = self.timeEdit_horario_edit.time().toString()
             client.save()
             self.goto_clients_list()
             self.update_client_list()
@@ -567,6 +837,7 @@ class Main(QMainWindow):
                     client.numero_de_telefono = self.lineEdit_telefono_admin_edit.text()
                     client.fecha_ingreso = str(fecha_ingreso_datetime)
                     client.ultimo_pago = str(ultimo_pago_datetime)
+                    client.horario = self.timeEdit_horario_admin_edit.time().toString()
                     client.foto = uploaded_file
             else:
                 client.ci = self.lineEdit_ci_admin_edit.text()
@@ -577,6 +848,7 @@ class Main(QMainWindow):
                 client.numero_de_telefono = self.lineEdit_telefono_admin_edit.text()
                 client.fecha_ingreso = str(fecha_ingreso_datetime)
                 client.ultimo_pago = str(ultimo_pago_datetime)
+                client.horario = self.timeEdit_horario_admin_edit.time().toString()
             client.save()
             self.goto_clients_list()
             self.update_client_list()
@@ -605,17 +877,25 @@ class Main(QMainWindow):
 
     def handle_notificar(self, checked, ci):
         if checked:
-            client = Cliente.objects.get(ci=ci)
-            client.notificado = checked
-            client.debe_notificarse = False
-            client.save()
-            self.update_all_data()
+            try:
+                client = Cliente.objects.get(ci=ci)
+                client.notificado = checked
+                client.debe_notificarse = False
+                client.save()
+            except Exception:
+                print(Exception)
+            finally:
+                self.update_all_data()
         else:
-            client = Cliente.objects.get(ci=ci)
-            client.notificado = checked
-            client.debe_notificarse = True
-            client.save()
-            self.update_all_data()
+            try:
+                client = Cliente.objects.get(ci=ci)
+                client.notificado = checked
+                client.debe_notificarse = True
+                client.save()
+            except Exception:
+                print(Exception)
+            finally:
+                self.update_all_data()
 
     def handle_cobrar(self, value):
         try:
@@ -637,7 +917,7 @@ class Main(QMainWindow):
         self.total_unpaids.setText(str(self.states.data['unpaids_amount']))
         self.total_notify.setText(str(self.states.data['notify_amount']))
         for client in self.states.data['client_list']:
-            item_widget = ClientListItem(client, self.assets_path, self.credentials)
+            item_widget = ClientListItem(client, self.assets_path, self.credentials, self.theme_dark)
             item_widget.view_changed.connect(self.handle_view_changed)
             item_widget.delete_client_signal.connect(self.delete_client)
             list_item = QListWidgetItem(self.listWidget)
@@ -648,7 +928,7 @@ class Main(QMainWindow):
         self.deudors_list.clear()
         self.states.initialize_data()
         for client in self.states.data['deudor_list']:
-            item_widget = DeudorListItem(client, self.assets_path)
+            item_widget = DeudorListItem(client, self.assets_path, self.theme_dark)
             item_widget.marcar_notificado_signal.connect(self.handle_notificar)
             item_widget.cobrar_deuda_signal.connect(self.handle_cobrar)
             list_item = QListWidgetItem(self.deudors_list)
@@ -659,7 +939,7 @@ class Main(QMainWindow):
         self.notify_list.clear()
         self.states.initialize_data()
         for client in self.states.data['notify_client_list']:
-            item_widget = DeudorListItem(client, self.assets_path)
+            item_widget = DeudorListItem(client, self.assets_path, self.theme_dark)
             item_widget.marcar_notificado_signal.connect(self.handle_notificar)
             item_widget.cobrar_deuda_signal.connect(self.handle_cobrar)
             list_item = QListWidgetItem(self.notify_list)
@@ -701,6 +981,7 @@ class Session(QDialog):
         self.setWindowIcon(QIcon('icon.png'))
         self.error_credentials.hide()
         self.login.clicked.connect(self.validate)
+        self.setWindowIcon(QIcon('./_internal/views/ui/assets/background dark.ico'))
 
     def get_assets(self, file):
         return os.path.join(self.assets_path, file)

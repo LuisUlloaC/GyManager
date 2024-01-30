@@ -14,6 +14,7 @@ class Cliente(models.Model):
     fecha_ingreso = models.DateField()
     ultimo_pago = models.DateField(blank=True, null=True)
     foto = models.ImageField(upload_to=f'images/')
+    horario = models.CharField(max_length=10, default='')
 
 
     def nombre_completo(self):
@@ -52,6 +53,7 @@ class Cliente(models.Model):
             "notificado": self.notificado,
             "debe_notificarse": self.debe_notificarse,
             "numero_de_telefono": self.numero_de_telefono,
+            "horario": self.horario,
             "foto": self.foto
         }
 

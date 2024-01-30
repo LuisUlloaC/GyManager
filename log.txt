@@ -1,0 +1,27 @@
+
+ stdout ->No changes detected
+
+ stdout ->No changes detected
+
+ stdout ->Migrations for 'data':
+  data\migrations\0001_initial.py
+    - Create model Cliente
+
+ stdout ->Operations to perform:
+  Apply all migrations: data
+Running migrations:
+  No migrations to apply.
+
+ stdout ->Operations to perform:
+  Apply all migrations: data
+Running migrations:
+  No migrations to apply.
+
+ Exception ->
+ no such column: data_cliente.horario
+ Exception ->
+ no such table: data_cliente
+ stdout ->Operations to perform:
+  Apply all migrations: data
+Running migrations:
+  Applying data.0001_initial... OK

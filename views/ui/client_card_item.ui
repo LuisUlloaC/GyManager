@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>272</width>
-    <height>348</height>
+    <height>446</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -32,7 +32,12 @@
    <string>Form</string>
   </property>
   <property name="styleSheet">
-   <string notr="true">background-color: rgb(53, 53, 53);</string>
+   <string notr="true">QFrame {
+	border-style:solid;
+	border-width:1px;
+	border-color:black;
+	border-radius:12px;
+}</string>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout_4">
    <item>
@@ -56,12 +61,7 @@
       </size>
      </property>
      <property name="styleSheet">
-      <string notr="true">QFrame {
-	border-style: solid;
-	border-width:1px;
-	border-color:rgb(255,170,0);
-	border-radius: 5px;	
-}</string>
+      <string notr="true"/>
      </property>
      <property name="frameShape">
       <enum>QFrame::StyledPanel</enum>
@@ -114,7 +114,7 @@
         <property name="styleSheet">
          <string notr="true">border-top-left-radius: 5px;
 border-top-right-radius: 5px;
-background-color: rgb(53, 53, 53);</string>
+background-color: transparent;</string>
         </property>
         <property name="frameShape">
          <enum>QFrame::NoFrame</enum>
@@ -172,8 +172,7 @@ background-color: rgb(53, 53, 53);</string>
                <bool>false</bool>
               </property>
               <property name="styleSheet">
-               <string notr="true">background-color: rgb(53, 53, 53);
-border-style: none;</string>
+               <string notr="true">border-style: none;</string>
               </property>
               <property name="text">
                <string/>
@@ -190,7 +189,7 @@ border-style: none;</string>
              <widget class="QLabel" name="name">
               <property name="minimumSize">
                <size>
-                <width>0</width>
+                <width>215</width>
                 <height>20</height>
                </size>
               </property>
@@ -210,8 +209,7 @@ border-style: none;</string>
                <bool>false</bool>
               </property>
               <property name="styleSheet">
-               <string notr="true">background-color: rgb(53, 53, 53);
-border-style: none;</string>
+               <string notr="true">border-style: none;</string>
               </property>
               <property name="text">
                <string>TextLabel</string>
@@ -222,218 +220,6 @@ border-style: none;</string>
              </widget>
             </item>
            </layout>
-          </item>
-          <item>
-           <layout class="QHBoxLayout" name="horizontalLayout_2">
-            <item>
-             <widget class="QLabel" name="label_4">
-              <property name="minimumSize">
-               <size>
-                <width>20</width>
-                <height>20</height>
-               </size>
-              </property>
-              <property name="maximumSize">
-               <size>
-                <width>20</width>
-                <height>20</height>
-               </size>
-              </property>
-              <property name="autoFillBackground">
-               <bool>false</bool>
-              </property>
-              <property name="styleSheet">
-               <string notr="true">background-color: rgb(53, 53, 53);
-border-style: none;</string>
-              </property>
-              <property name="frameShape">
-               <enum>QFrame::NoFrame</enum>
-              </property>
-              <property name="frameShadow">
-               <enum>QFrame::Plain</enum>
-              </property>
-              <property name="text">
-               <string/>
-              </property>
-              <property name="pixmap">
-               <pixmap>assets/icons8-calendario-48.png</pixmap>
-              </property>
-              <property name="scaledContents">
-               <bool>true</bool>
-              </property>
-             </widget>
-            </item>
-            <item>
-             <widget class="QLabel" name="date_joined">
-              <property name="minimumSize">
-               <size>
-                <width>0</width>
-                <height>20</height>
-               </size>
-              </property>
-              <property name="maximumSize">
-               <size>
-                <width>16777215</width>
-                <height>20</height>
-               </size>
-              </property>
-              <property name="font">
-               <font>
-                <family>Dubai</family>
-                <pointsize>12</pointsize>
-               </font>
-              </property>
-              <property name="styleSheet">
-               <string notr="true">background-color: rgb(53, 53, 53);
-border-style: none;</string>
-              </property>
-              <property name="text">
-               <string>TextLabel</string>
-              </property>
-             </widget>
-            </item>
-           </layout>
-          </item>
-          <item>
-           <layout class="QHBoxLayout" name="horizontalLayout_3">
-            <item>
-             <widget class="QLabel" name="label_2">
-              <property name="minimumSize">
-               <size>
-                <width>20</width>
-                <height>20</height>
-               </size>
-              </property>
-              <property name="maximumSize">
-               <size>
-                <width>20</width>
-                <height>20</height>
-               </size>
-              </property>
-              <property name="styleSheet">
-               <string notr="true">background-color: rgb(53, 53, 53);
-border-style: none;</string>
-              </property>
-              <property name="text">
-               <string/>
-              </property>
-              <property name="pixmap">
-               <pixmap>assets/icons8-pesa-48.png</pixmap>
-              </property>
-              <property name="scaledContents">
-               <bool>true</bool>
-              </property>
-             </widget>
-            </item>
-            <item>
-             <widget class="QLabel" name="training_type">
-              <property name="minimumSize">
-               <size>
-                <width>0</width>
-                <height>20</height>
-               </size>
-              </property>
-              <property name="maximumSize">
-               <size>
-                <width>16777215</width>
-                <height>20</height>
-               </size>
-              </property>
-              <property name="font">
-               <font>
-                <family>Dubai</family>
-                <pointsize>12</pointsize>
-               </font>
-              </property>
-              <property name="styleSheet">
-               <string notr="true">background-color: rgb(53, 53, 53);
-border-style: none;</string>
-              </property>
-              <property name="text">
-               <string>TextLabel</string>
-              </property>
-             </widget>
-            </item>
-           </layout>
-          </item>
-          <item>
-           <layout class="QHBoxLayout" name="horizontalLayout_4">
-            <item>
-             <widget class="QLabel" name="label_6">
-              <property name="minimumSize">
-               <size>
-                <width>20</width>
-                <height>20</height>
-               </size>
-              </property>
-              <property name="maximumSize">
-               <size>
-                <width>20</width>
-                <height>20</height>
-               </size>
-              </property>
-              <property name="styleSheet">
-               <string notr="true">background-color: rgb(53, 53, 53);
-border-style: none;</string>
-              </property>
-              <property name="text">
-               <string/>
-              </property>
-              <property name="pixmap">
-               <pixmap>assets/icons8-efectivo-en-mano-48.png</pixmap>
-              </property>
-              <property name="scaledContents">
-               <bool>true</bool>
-              </property>
-             </widget>
-            </item>
-            <item>
-             <widget class="QLabel" name="last_pay">
-              <property name="minimumSize">
-               <size>
-                <width>0</width>
-                <height>20</height>
-               </size>
-              </property>
-              <property name="maximumSize">
-               <size>
-                <width>16777215</width>
-                <height>20</height>
-               </size>
-              </property>
-              <property name="font">
-               <font>
-                <family>Dubai</family>
-                <pointsize>12</pointsize>
-               </font>
-              </property>
-              <property name="styleSheet">
-               <string notr="true">background-color: rgb(53, 53, 53);
-border-style: none;</string>
-              </property>
-              <property name="text">
-               <string>TextLabel</string>
-              </property>
-             </widget>
-            </item>
-           </layout>
-          </item>
-         </layout>
-        </item>
-        <item>
-         <layout class="QVBoxLayout" name="verticalLayout_5">
-          <item>
-           <spacer name="verticalSpacer">
-            <property name="orientation">
-             <enum>Qt::Vertical</enum>
-            </property>
-            <property name="sizeHint" stdset="0">
-             <size>
-              <width>20</width>
-              <height>40</height>
-             </size>
-            </property>
-           </spacer>
           </item>
           <item>
            <layout class="QHBoxLayout" name="horizontalLayout_5">
@@ -464,8 +250,7 @@ border-style: none;</string>
                </size>
               </property>
               <property name="styleSheet">
-               <string>background-color: rgb(53, 53, 53);
-border-style: none;</string>
+               <string notr="true">border-style: none;</string>
               </property>
               <property name="text">
                <string/>
@@ -482,7 +267,76 @@ border-style: none;</string>
              <widget class="QLabel" name="phone_number">
               <property name="minimumSize">
                <size>
-                <width>0</width>
+                <width>210</width>
+                <height>20</height>
+               </size>
+              </property>
+              <property name="maximumSize">
+               <size>
+                <width>210</width>
+                <height>20</height>
+               </size>
+              </property>
+              <property name="font">
+               <font>
+                <family>Dubai</family>
+                <pointsize>12</pointsize>
+               </font>
+              </property>
+              <property name="styleSheet">
+               <string notr="true">border-style: none;</string>
+              </property>
+              <property name="text">
+               <string>TextLabel</string>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </item>
+          <item>
+           <layout class="QHBoxLayout" name="horizontalLayout_2">
+            <item>
+             <widget class="QLabel" name="label_4">
+              <property name="minimumSize">
+               <size>
+                <width>20</width>
+                <height>20</height>
+               </size>
+              </property>
+              <property name="maximumSize">
+               <size>
+                <width>20</width>
+                <height>20</height>
+               </size>
+              </property>
+              <property name="autoFillBackground">
+               <bool>false</bool>
+              </property>
+              <property name="styleSheet">
+               <string notr="true">border-style: none;</string>
+              </property>
+              <property name="frameShape">
+               <enum>QFrame::NoFrame</enum>
+              </property>
+              <property name="frameShadow">
+               <enum>QFrame::Plain</enum>
+              </property>
+              <property name="text">
+               <string/>
+              </property>
+              <property name="pixmap">
+               <pixmap>assets/icons8-calendario-50.png</pixmap>
+              </property>
+              <property name="scaledContents">
+               <bool>true</bool>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QLabel" name="date_joined">
+              <property name="minimumSize">
+               <size>
+                <width>215</width>
                 <height>20</height>
                </size>
               </property>
@@ -499,8 +353,7 @@ border-style: none;</string>
                </font>
               </property>
               <property name="styleSheet">
-               <string notr="true">background-color: rgb(53, 53, 53);
-border-style: none;</string>
+               <string notr="true">border-style: none;</string>
               </property>
               <property name="text">
                <string>TextLabel</string>
@@ -510,20 +363,184 @@ border-style: none;</string>
            </layout>
           </item>
           <item>
-           <spacer name="verticalSpacer_2">
-            <property name="orientation">
-             <enum>Qt::Vertical</enum>
-            </property>
-            <property name="sizeType">
-             <enum>QSizePolicy::Preferred</enum>
-            </property>
-            <property name="sizeHint" stdset="0">
-             <size>
-              <width>20</width>
-              <height>30</height>
-             </size>
-            </property>
-           </spacer>
+           <layout class="QHBoxLayout" name="horizontalLayout_3">
+            <item>
+             <widget class="QLabel" name="label_2">
+              <property name="minimumSize">
+               <size>
+                <width>20</width>
+                <height>20</height>
+               </size>
+              </property>
+              <property name="maximumSize">
+               <size>
+                <width>20</width>
+                <height>20</height>
+               </size>
+              </property>
+              <property name="styleSheet">
+               <string notr="true">border-style: none;</string>
+              </property>
+              <property name="text">
+               <string/>
+              </property>
+              <property name="pixmap">
+               <pixmap>assets/icons8-pesa-50.png</pixmap>
+              </property>
+              <property name="scaledContents">
+               <bool>true</bool>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QLabel" name="training_type">
+              <property name="minimumSize">
+               <size>
+                <width>215</width>
+                <height>20</height>
+               </size>
+              </property>
+              <property name="maximumSize">
+               <size>
+                <width>16777215</width>
+                <height>20</height>
+               </size>
+              </property>
+              <property name="font">
+               <font>
+                <family>Dubai</family>
+                <pointsize>12</pointsize>
+               </font>
+              </property>
+              <property name="styleSheet">
+               <string notr="true">border-style: none;</string>
+              </property>
+              <property name="text">
+               <string>TextLabel</string>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </item>
+          <item>
+           <layout class="QHBoxLayout" name="horizontalLayout_4">
+            <item>
+             <widget class="QLabel" name="label_6">
+              <property name="minimumSize">
+               <size>
+                <width>20</width>
+                <height>20</height>
+               </size>
+              </property>
+              <property name="maximumSize">
+               <size>
+                <width>20</width>
+                <height>20</height>
+               </size>
+              </property>
+              <property name="styleSheet">
+               <string notr="true">border-style: none;</string>
+              </property>
+              <property name="text">
+               <string/>
+              </property>
+              <property name="pixmap">
+               <pixmap>assets/icons8-efectivo-en-mano-48.png</pixmap>
+              </property>
+              <property name="scaledContents">
+               <bool>true</bool>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QLabel" name="last_pay">
+              <property name="minimumSize">
+               <size>
+                <width>215</width>
+                <height>20</height>
+               </size>
+              </property>
+              <property name="maximumSize">
+               <size>
+                <width>16777215</width>
+                <height>20</height>
+               </size>
+              </property>
+              <property name="font">
+               <font>
+                <family>Dubai</family>
+                <pointsize>12</pointsize>
+               </font>
+              </property>
+              <property name="styleSheet">
+               <string notr="true">border-style: none;</string>
+              </property>
+              <property name="text">
+               <string>TextLabel</string>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </item>
+          <item>
+           <layout class="QHBoxLayout" name="horizontalLayout_8">
+            <item>
+             <widget class="QLabel" name="label_5">
+              <property name="minimumSize">
+               <size>
+                <width>20</width>
+                <height>20</height>
+               </size>
+              </property>
+              <property name="maximumSize">
+               <size>
+                <width>20</width>
+                <height>20</height>
+               </size>
+              </property>
+              <property name="styleSheet">
+               <string notr="true">border: none;</string>
+              </property>
+              <property name="text">
+               <string/>
+              </property>
+              <property name="pixmap">
+               <pixmap>assets/icons8-reloj-50.png</pixmap>
+              </property>
+              <property name="scaledContents">
+               <bool>true</bool>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QLabel" name="horario">
+              <property name="minimumSize">
+               <size>
+                <width>215</width>
+                <height>0</height>
+               </size>
+              </property>
+              <property name="maximumSize">
+               <size>
+                <width>16777215</width>
+                <height>20</height>
+               </size>
+              </property>
+              <property name="font">
+               <font>
+                <family>Dubai</family>
+                <pointsize>12</pointsize>
+               </font>
+              </property>
+              <property name="styleSheet">
+               <string notr="true">border: none;</string>
+              </property>
+              <property name="text">
+               <string>TextLabel</string>
+              </property>
+             </widget>
+            </item>
+           </layout>
           </item>
           <item>
            <layout class="QHBoxLayout" name="horizontalLayout_7">
@@ -537,28 +554,28 @@ border-style: none;</string>
               </property>
               <property name="minimumSize">
                <size>
-                <width>45</width>
-                <height>45</height>
+                <width>60</width>
+                <height>30</height>
                </size>
               </property>
               <property name="maximumSize">
                <size>
-                <width>45</width>
-                <height>45</height>
+                <width>30</width>
+                <height>30</height>
                </size>
               </property>
               <property name="styleSheet">
-               <string notr="true">border-color: rgb(255, 170, 0);
+               <string notr="true">border-color: black;
 border-width: 2px;
 border-style: solid;
-border-radius: 12px;</string>
+border-radius: 8px;</string>
               </property>
               <property name="text">
                <string/>
               </property>
               <property name="icon">
                <iconset>
-                <normaloff>assets/icons8-editar-48.png</normaloff>assets/icons8-editar-48.png</iconset>
+                <normaloff>assets/icons8-editar-24.png</normaloff>assets/icons8-editar-24.png</iconset>
               </property>
              </widget>
             </item>
@@ -572,28 +589,28 @@ border-radius: 12px;</string>
               </property>
               <property name="minimumSize">
                <size>
-                <width>45</width>
-                <height>45</height>
+                <width>60</width>
+                <height>30</height>
                </size>
               </property>
               <property name="maximumSize">
                <size>
-                <width>45</width>
-                <height>45</height>
+                <width>30</width>
+                <height>30</height>
                </size>
               </property>
               <property name="styleSheet">
-               <string notr="true">border-color: rgb(255, 170, 0);
+               <string notr="true">border-color: black;
 border-width: 2px;
 border-style: solid;
-border-radius: 12px;</string>
+border-radius: 8px;</string>
               </property>
               <property name="text">
                <string/>
               </property>
               <property name="icon">
                <iconset>
-                <normaloff>assets/icons8-basura-llena-48.png</normaloff>assets/icons8-basura-llena-48.png</iconset>
+                <normaloff>assets/icons8-basura-30.png</normaloff>assets/icons8-basura-30.png</iconset>
               </property>
              </widget>
             </item>
